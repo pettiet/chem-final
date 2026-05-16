@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chem Cheat Sheet</title>
+<style>
+/* =========================================================
+ * Landscape letter, one "card" per page. Designed as a
+ * read-and-copy reference — not literal index card size.
+ * ========================================================= */
+@page { size: letter landscape; margin: 0.4in; }
+
+@media print {
+  body { margin: 0; padding: 0; background: #fff; }
+  .screen-only { display: none !important; }
+  .card { page-break-after: always; box-shadow: none; margin: 0; }
+  .card:last-of-type { page-break-after: auto; }
+}
+
+html, body {
+  margin: 0; padding: 0;
+  background: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: #0f172a;
+}
+
+.screen-only { padding: 16px; text-align: center; }
+.screen-only h1 { margin: 0 0 4px; font-size: 18px; }
+.screen-only p { margin: 4px 0; color: #475569; font-size: 14px; }
+.screen-only .print-btn {
+  display: inline-block; margin-top: 8px;
+  background: #0f172a; color: #fff; text-decoration: none;
+  border: none; padding: 10px 16px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+
+.card {
+  width: 10in;
+  box-sizing: border-box;
+  padding: 0.3in 0.35in;
+  background: #fff;
+  color: #0f172a;
+  font-size: 11pt;
+  line-height: 1.35;
+  margin: 14px auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.card .title {
+  position: absolute; top: 8px; right: 14px;
+  font-size: 9pt; color: #94a3b8; letter-spacing: 0.5px;
+  text-transform: uppercase; font-weight: 700;
+}
+
+.grid { display: grid; gap: 0.18in; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.box {
+  border: 1pt solid #334155;
+  border-radius: 6pt;
+  padding: 8pt 11pt 10pt;
+}
+.box h3 {
+  margin: 0 0 5pt;
+  font-size: 11pt;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+  color: #0ea5e9;
+  font-weight: 800;
+  border-bottom: 0.7pt solid #cbd5e1;
+  padding-bottom: 2pt;
+}
+.box.warn { border-color: #b91c1c; background: #fef2f2; }
+.box.warn h3 { color: #b91c1c; }
+
+.kv { display: grid; grid-template-columns: auto 1fr; column-gap: 8pt; row-gap: 2pt; }
+.kv b { white-space: nowrap; }
+
+.formula { font-family: "SF Mono","Menlo",Consolas,monospace; font-weight: 700; }
+
+.tight { margin: 0; }
+ul.tight { padding-left: 16pt; margin: 0; }
+ul.tight li { margin: 1pt 0; }
+
+.sub { color: #475569; }
+.muted { color: #64748b; font-size: 10pt; }
+.no { color: #b91c1c; font-weight: 700; }
+.yes { color: #16a34a; font-weight: 700; }
+
+table.geo, table.poly, table.decay {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 10.5pt;
+}
+table.geo td, table.poly td, table.decay td {
+  padding: 2pt 5pt;
+  border-bottom: 0.4pt dotted #cbd5e1;
+  vertical-align: top;
+}
+table.geo tr:last-child td, table.poly tr:last-child td, table.decay tr:last-child td { border-bottom: none; }
+
+.hdr {
+  display: flex; align-items: baseline; justify-content: space-between;
+  border-bottom: 1.2pt solid #0f172a;
+  padding-bottom: 4pt; margin-bottom: 10pt;
+}
+.hdr .name { font-size: 16pt; font-weight: 800; letter-spacing: 0.2pt; }
+.hdr .side { font-size: 9pt; color: #64748b; text-transform: uppercase; letter-spacing: 0.5pt; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="screen-only">
+  <h1>Chemistry Cheat Sheet</h1>
+  <p>Two landscape pages — print both, then copy onto his real index card.</p>
+  <p><button class="print-btn" onclick="window.print()">🖨️ Print</button></p>
+</div>
+
+<!-- =================== FRONT =================== -->
+<div class="card">
+  <span class="title">FRONT</span>
+
+  <div class="hdr">
+    <span class="name">Chem Final — Cheat Sheet</span>
+    <span class="side">Formulas &amp; Structure</span>
+  </div>
+
+  <div class="grid grid-3">
+
+    <!-- Column 1: Formulas -->
+    <div class="box">
+      <h3>Key Formulas</h3>
+      <div class="kv">
+        <b>Molarity</b><span><span class="formula">M = mol / L</span></span>
+        <b>Dilution</b><span><span class="formula">M₁V₁ = M₂V₂</span></span>
+        <b>Water added</b><span><span class="formula">V<sub>added</sub> = V₂ − V₁</span></span>
+        <b>Beer's law</b><span><span class="formula">A = εbc</span></span>
+        <b>Heat</b><span><span class="formula">q = mcΔT</span></span>
+        <b>c<sub>water</sub></b><span>4.186 J/g·°C</span>
+        <b>ΔT</b><span><span class="formula">T<sub>final</sub> − T<sub>initial</sub></span></span>
+        <b>Calorimetry</b><span><span class="formula">−q<sub>metal</sub> = q<sub>water</sub></span></span>
+        <b>% yield</b><span><span class="formula">(actual/theo)×100</span></span>
+        <b>Half-life</b><span><span class="formula">N = N₀(½)<sup>n</sup></span></span>
+        <b>n</b><span><span class="formula">n = t / t<sub>½</sub></span></span>
+      </div>
+    </div>
+
+    <!-- Column 2: Bonding + VSEPR -->
+    <div class="box">
+      <h3>EN diff → bond</h3>
+      <ul class="tight">
+        <li>&lt; 0.4 → nonpolar covalent</li>
+        <li>0.4–1.7 → polar covalent</li>
+        <li>≥ 1.7 → ionic</li>
+        <li><span class="no">HF = polar covalent</span> (exception!)</li>
+      </ul>
+      <div class="muted" style="margin-top:1pt">metal+nonmetal → ionic · nm+nm → covalent</div>
+
+      <h3 style="margin-top:4pt">VSEPR shapes</h3>
+      <table class="geo">
+        <tr><td>2 grps, 0 lp</td><td>linear · 180°</td></tr>
+        <tr><td>3 grps, 0 lp</td><td>trig planar · 120°</td></tr>
+        <tr><td>4 grps, 0 lp</td><td>tetrahedral · 109.5°</td></tr>
+        <tr><td>4 grps, 1 lp</td><td>trig pyramidal · ~107°</td></tr>
+        <tr><td>4 grps, 2 lp</td><td>bent · ~104.5°</td></tr>
+      </table>
+      <div class="muted" style="margin-top:1pt">Symmetric shape + same atoms → nonpolar molecule. Asymmetric or lone pair → polar.</div>
+    </div>
+
+    <!-- Column 3: IMFs + Decay -->
+    <div class="box">
+      <h3>IMFs (weak → strong)</h3>
+      <ul class="tight">
+        <li><b>London dispersion</b> — in EVERY molecule. Bigger = stronger.</li>
+        <li><b>Dipole–dipole</b> — polar molecules only.</li>
+        <li><b>H-bonding</b> — only when H is bonded to <b>N, O, or F</b>.</li>
+      </ul>
+      <div class="muted" style="margin-top:1pt"><span class="no">BH₃ &amp; HCl have NO H-bonding.</span></div>
+
+      <h3 style="margin-top:4pt">Nuclear decay</h3>
+      <table class="decay">
+        <tr><td><b>α</b> (⁴₂He)</td><td>A −4, Z −2</td></tr>
+        <tr><td><b>β⁻</b> (⁰₋₁e)</td><td>A same, Z +1</td></tr>
+        <tr><td><b>β⁺</b> positron</td><td>A same, Z −1</td></tr>
+        <tr><td><b>γ</b> gamma</td><td>nothing — pure energy</td></tr>
+        <tr><td>e⁻ capture</td><td>A same, Z −1</td></tr>
+      </table>
+      <div class="muted" style="margin-top:1pt">Fission = big → small (power plants). Fusion = small → big (sun).</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- =================== BACK =================== -->
+<div class="card">
+  <span class="title">BACK</span>
+
+  <div class="hdr">
+    <span class="name">Chem Final — Cheat Sheet</span>
+    <span class="side">Naming, Reactions, Traps</span>
+  </div>
+
+  <div class="grid grid-3">
+
+    <!-- Column 1: Polyatomic ions + naming -->
+    <div class="box">
+      <h3>Polyatomic ions</h3>
+      <table class="poly">
+        <tr><td>NO₃⁻</td><td>nitrate</td></tr>
+        <tr><td>NO₂⁻</td><td>nitr<u>ite</u></td></tr>
+        <tr><td>SO₄²⁻</td><td>sulfate</td></tr>
+        <tr><td>SO₃²⁻</td><td>sulf<u>ite</u></td></tr>
+        <tr><td>PO₄³⁻</td><td>phosphate</td></tr>
+        <tr><td>CO₃²⁻</td><td>carbonate</td></tr>
+        <tr><td>OH⁻</td><td>hydroxide</td></tr>
+        <tr><td>NH₄⁺</td><td>ammonium</td></tr>
+        <tr><td>C₂H₃O₂⁻</td><td>acetate</td></tr>
+      </table>
+      <div class="muted" style="margin-top:1pt">-<b>ate</b> has more O than -<b>ite</b>.</div>
+
+      <h3 style="margin-top:4pt">Naming</h3>
+      <ul class="tight">
+        <li>Ionic: <b>NO prefixes</b></li>
+        <li>Covalent: <b>USE prefixes</b><br/>mono/di/tri/tetra/penta/hexa/hepta/octa/nona/deca</li>
+        <li>Transition metal → Roman numeral (Fe³⁺ = iron(III))</li>
+        <li>Criss-cross charges → formula</li>
+      </ul>
+    </div>
+
+    <!-- Column 2: Reactions + solubility + stoich -->
+    <div class="box">
+      <h3>5 Reaction types</h3>
+      <ul class="tight">
+        <li><b>Synthesis:</b> A + B → AB</li>
+        <li><b>Decomp:</b> AB → A + B</li>
+        <li><b>Single rep:</b> A + BC → AC + B</li>
+        <li><b>Double rep:</b> AB + CD → AD + CB</li>
+        <li><b>Combustion:</b> C<sub>x</sub>H<sub>y</sub> + O₂ → CO₂ + H₂O</li>
+      </ul>
+      <div class="muted" style="margin-top:1pt">Diatomic: <b>BrINClHOF</b></div>
+
+      <h3 style="margin-top:3pt">Solubility</h3>
+      <ul class="tight">
+        <li><span class="yes">Soluble:</span> NO₃⁻, group 1, NH₄⁺</li>
+        <li><span class="no">Insoluble:</span> most CO₃²⁻, PO₄³⁻, S²⁻</li>
+        <li>Net ionic = drop spectators (≠ skeleton)</li>
+      </ul>
+
+      <h3 style="margin-top:3pt">Stoichiometry</h3>
+      <ul class="tight">
+        <li><span class="formula">g → mol → mol → g</span></li>
+        <li>Mole ratio from coefficients</li>
+        <li>Limiting = smallest (mol ÷ coeff)</li>
+        <li>Never change subscripts</li>
+      </ul>
+    </div>
+
+    <!-- Column 3: Thermo + Trap reminders (flat, no nested box) -->
+    <div class="box">
+      <h3>Thermochemistry</h3>
+      <ul class="tight">
+        <li><b>Exo:</b> ΔH&lt;0 · hot · products lower E</li>
+        <li><b>Endo:</b> ΔH&gt;0 · cold · products higher E</li>
+        <li>Heating curve <b>FLAT</b> during phase change</li>
+        <li>Heat = total E; Temp = avg KE</li>
+      </ul>
+
+      <h3 style="margin-top:3pt; color:#b91c1c">⚠ Trap reminders</h3>
+      <ul class="tight" style="color:#7f1d1d">
+        <li><b>HF</b> = polar covalent (not ionic)</li>
+        <li><b>BH₃</b> &amp; <b>HCl</b>: <b>no</b> H-bonding</li>
+        <li><b>CaCl₂</b> = calcium chloride (no "di-")</li>
+        <li><b>Li₂SO₃</b> = sulf<u>ite</u> (3 O)</li>
+        <li><b>V water ADDED</b> = V₂ − V₁</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Cumulative Exam · Chem Final</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="exam">
+  <div class="topbar">
+    <a class="back" href="index.html">‹ Back</a>
+    <span class="title">Cumulative Exam</span>
+    <span style="min-width:44px"></span>
+  </div>
+
+  <div class="wrap" id="exam-root"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/lessons.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script>
+  (function () {
+    const root = document.getElementById('exam-root');
+    const MODULES = window.AppKit.MODULES;
+    const TOTAL_PER_MODULE = 3; // 9 * 3 + extras → trimmed to 30
+    const TARGET_TOTAL = 30;
+
+    function buildExamQuestions() {
+      // Pick 3 from each module, then trim to TARGET_TOTAL (drop extras randomly)
+      const tagged = [];
+      MODULES.forEach(m => {
+        const qs = QuizEngine.pickQuestions(m.id, TOTAL_PER_MODULE);
+        qs.forEach(q => tagged.push({ ...q, _moduleId: m.id }));
+      });
+      // shuffle then take 30
+      for (let i = tagged.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tagged[i], tagged[j]] = [tagged[j], tagged[i]];
+      }
+      return tagged.slice(0, TARGET_TOTAL);
+    }
+
+    function startScreen() {
+      root.innerHTML = `
+        <div class="hero">
+          <div class="hello">
+            <h1>📝 Cumulative Exam</h1>
+          </div>
+          <div class="readiness">
+            <div style="font-size:38px">🧪</div>
+            <div>
+              <div class="label">${TARGET_TOTAL} questions · all modules</div>
+              <div class="value" style="font-size:18px">No instant feedback</div>
+              <div class="hint">Answers and a study plan appear at the end.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta-wrap">
+          <button class="btn" id="begin">Begin Exam →</button>
+          <a class="btn ghost" href="index.html">Back to dashboard</a>
+        </div>
+      `;
+      document.getElementById('begin').addEventListener('click', () => runExam());
+    }
+
+    function runExam() {
+      const questions = buildExamQuestions();
+      const answers = new Array(questions.length).fill(null);
+      let i = 0;
+      const started = Date.now();
+
+      function render() {
+        const q = questions[i];
+        const pct = Math.round((i / questions.length) * 100);
+        root.innerHTML = `
+          <div class="quiz-header">
+            <span>Question ${i+1} / ${questions.length}</span>
+            <span>${getAnsweredCount(answers)} answered</span>
+          </div>
+          <div class="quiz-progress"><span style="width:${pct}%"></span></div>
+          <div class="question-card">
+            <p class="question-prompt">${q.prompt}</p>
+            <div id="ans"></div>
+          </div>
+          <div class="action-bar">
+            <button class="btn secondary" id="prev" ${i === 0 ? 'disabled' : ''}>‹ Prev</button>
+            <button class="btn" id="next">${i === questions.length - 1 ? 'Submit Exam' : 'Next ›'}</button>
+          </div>
+        `;
+        const ansEl = document.getElementById('ans');
+        renderAnswerInput(q, answers[i], ansEl, (val) => { answers[i] = val; });
+
+        document.getElementById('prev').addEventListener('click', () => { if (i > 0) { i--; render(); } });
+        document.getElementById('next').addEventListener('click', () => {
+          if (i < questions.length - 1) { i++; render(); }
+          else finish();
+        });
+      }
+
+      function finish() {
+        // Score
+        let correct = 0;
+        const perModule = {}; // id -> {correct, total}
+        MODULES.forEach(m => perModule[m.id] = { correct: 0, total: 0 });
+        questions.forEach((q, idx) => {
+          const mid = q._moduleId;
+          perModule[mid].total += 1;
+          const v = answers[idx];
+          let ok = false;
+          if (v === null || v === undefined || v === '') ok = false;
+          else if (q.type === 'mc') ok = (v === q.correctIndex);
+          else if (q.type === 'numeric') {
+            const num = parseFloat(v); ok = !isNaN(num) && Math.abs(num - q.answer) <= (q.tolerance || 0);
+          } else if (q.type === 'text') {
+            const norm = String(v).toLowerCase().trim().replace(/\s+/g, ' ');
+            ok = (q.accept || []).some(a => norm === a.toLowerCase().trim());
+          }
+          if (ok) { correct++; perModule[mid].correct += 1; }
+        });
+        const pct = Math.round((correct / questions.length) * 100);
+
+        // Save & badges
+        const pmPct = {};
+        Object.entries(perModule).forEach(([id, v]) => pmPct[id] = v.total ? Math.round((v.correct / v.total) * 100) : 0);
+        window.AppKit.reportExamResult(pct, pmPct);
+        if (pct >= 90) window.AppKit.celebrate();
+
+        // Render results
+        const sorted = MODULES
+          .map(m => ({ ...m, score: pmPct[m.id], n: perModule[m.id].total }))
+          .filter(m => m.n > 0)
+          .sort((a, b) => a.score - b.score);
+        const bottom3 = sorted.slice(0, 3);
+
+        root.innerHTML = `
+          <div class="score-hero">
+            <div class="big">${pct}%</div>
+            <div class="sub">${correct} of ${questions.length} correct · ${Math.round((Date.now()-started)/1000)}s</div>
+          </div>
+
+          <div class="section-title" style="margin-top:14px">Per-module breakdown</div>
+          <div class="bar-chart" id="bar-chart"></div>
+
+          <div class="section-title" style="margin-top:18px">Your study plan</div>
+          <div id="plan"></div>
+
+          <div class="action-bar">
+            <a class="btn secondary" href="index.html">Dashboard</a>
+            <button class="btn" id="retake">Retake →</button>
+          </div>
+        `;
+
+        const chart = document.getElementById('bar-chart');
+        MODULES.forEach(m => {
+          const score = pmPct[m.id];
+          const cls = score >= 80 ? 'hi' : score >= 60 ? 'mid' : 'lo';
+          const row = document.createElement('div'); row.className = 'bar-row';
+          row.innerHTML = `
+            <span class="bar-label">${m.emoji} ${m.title}</span>
+            <span class="bar-track"><span class="bar-fill ${cls}" style="width:0%"></span></span>
+            <span class="bar-val">${score}%</span>
+          `;
+          chart.appendChild(row);
+          requestAnimationFrame(() => {
+            row.querySelector('.bar-fill').style.width = `${score}%`;
+          });
+        });
+
+        const plan = document.getElementById('plan');
+        if (bottom3.length === 0 || bottom3.every(b => b.score >= 90)) {
+          plan.innerHTML = `<div class="plan-card"><h3>🎉 You crushed it across the board</h3><p class="why">No weak modules. Stay sharp by re-running module quizzes — numbers change every time.</p></div>`;
+        } else {
+          bottom3.forEach(m => {
+            const reasonByModule = {
+              'bonding': 'EN differences and the HF exception trip a lot of students.',
+              'lewis-geometry': 'Shape mistakes cascade into wrong polarity answers.',
+              'imf': 'The hydrogen-bonding rule (H must bond to N/O/F) is a high-frequency trap.',
+              'nomenclature': '-ite vs -ate and the no-prefixes-on-ionic rule are easy points.',
+              'solutions': 'Dilution math (especially "water ADDED") rewards practice.',
+              'reactions': 'Knowing the 5 reaction types lets you predict products fast.',
+              'stoichiometry': 'Limiting reactant and percent yield show up on most exams.',
+              'thermochem': 'q = mcΔT and calorimetry sign conventions are core points.',
+              'nuclear': 'Half-life math and decay rules are quick wins once memorized.',
+            };
+            const card = document.createElement('div');
+            card.className = 'plan-card';
+            card.innerHTML = `
+              <h3>${m.emoji} ${m.title} — ${m.score}%</h3>
+              <p class="why">${reasonByModule[m.id] || 'Worth another pass.'}</p>
+              <a class="btn" href="modules/${m.id}.html">Review this module →</a>
+            `;
+            plan.appendChild(card);
+          });
+        }
+
+        document.getElementById('retake').addEventListener('click', () => runExam());
+      }
+
+      render();
+    }
+
+    function getAnsweredCount(answers) {
+      return answers.filter(a => !(a === null || a === undefined || a === '')).length;
+    }
+
+    function renderAnswerInput(q, current, ansEl, onChange) {
+      if (q.type === 'mc') {
+        q.options.forEach((opt, idx) => {
+          const b = document.createElement('button');
+          b.className = 'opt'; b.type = 'button'; b.textContent = opt;
+          if (current === idx) b.style.outline = '2px solid var(--accent)';
+          b.addEventListener('click', () => {
+            ansEl.querySelectorAll('.opt').forEach(x => x.style.outline = '');
+            b.style.outline = '2px solid var(--accent)';
+            onChange(idx);
+          });
+          ansEl.appendChild(b);
+        });
+      } else if (q.type === 'numeric') {
+        const div = document.createElement('div'); div.className = 'num-input';
+        div.innerHTML = `<input type="number" inputmode="decimal" step="any" placeholder="Your answer" value="${current ?? ''}">
+                         ${q.units ? `<span class="units">${q.units}</span>` : ''}`;
+        ansEl.appendChild(div);
+        const inp = div.querySelector('input');
+        inp.addEventListener('input', () => onChange(inp.value));
+      } else if (q.type === 'text') {
+        const div = document.createElement('div'); div.className = 'text-input';
+        div.innerHTML = `<input type="text" autocapitalize="off" autocorrect="off" autocomplete="off" placeholder="Your answer" value="${current ?? ''}">`;
+        ansEl.appendChild(div);
+        const inp = div.querySelector('input');
+        inp.addEventListener('input', () => onChange(inp.value));
+      }
+    }
+
+    startScreen();
+  })();
+  </script>
+</body>
+</html>
